@@ -1,2 +1,2 @@
-http://www.neos-guide.org/content/multiple-traveling-salesman-problem-mtsp
-https://pbs.twimg.com/media/BkCh2ZQCQAEFP5m.jpg:large
+https://help.github.com/articles/set-up-git
+http://www.neos-guide.org/content/multiple-traveling-salesman-problem-mtsphttps://pbs.twimg.com/media/BkCh2ZQCQAEFP5m.jpg:large
