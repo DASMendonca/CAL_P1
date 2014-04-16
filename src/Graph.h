@@ -6,8 +6,8 @@
 
 #include <vector>
 #include <queue>
-using namespace std;
 
+using namespace std;
 template <class T> class Edge;
 template <class T> class Graph;
 
@@ -16,9 +16,10 @@ class Vertex {
 	T info;
 	vector<Edge<T>  > adj;
 	bool visited;
+	bool interest_point;
+	bool resting_point;
 	void addEdge(Vertex<T> *dest, double w);
 	bool removeEdgeTo(Vertex<T> *d);
-	int indegree;
 
 public:
 	Vertex(T in);
@@ -42,8 +43,11 @@ bool Vertex<T>::removeEdgeTo(Vertex<T> *d) {
 	return false;
 }
 
+
+/*Vertex Constructor*/
 template <class T>
 Vertex<T>::Vertex(T in): info(in), visited(false){}
+
 
 template <class T>
 T Vertex<T>::getInfo() const {
@@ -57,6 +61,7 @@ void Vertex<T>::addEdge(Vertex<T> *dest, double w) {
 	adj.push_back(edgeD);
 }
 
+
 template <class T>
 class Edge {
 	Vertex<T> * dest;
@@ -67,40 +72,24 @@ public:
 	friend class Vertex<T>;
 };
 
+/*Edge Constructor*/
 template <class T>
 Edge<T>::Edge(Vertex<T> *d, double w): dest(d), weight(w){}
 
+
 template <class T>
 class Graph {
+	vector<Vertex<T> *> path;
 	vector<Vertex<T> *> vertexSet;
+	vector<>
 	void dfs(Vertex<T> *v, vector<T> &res) const;
 public:
 	bool addVertex(const T &in);
 	bool addEdge(const T &sourc, const T &dest, double w);
 	bool removeVertex(const T &in);
 	bool removeEdge(const T &sourc, const T &dest);
-	vector<T> dfs() const;
-	vector<T> bfs(Vertex<T> *v) const;
-	int maxNewChildren(Vertex<T> *v, T &inf) const;
-	vector<Vertex<T> * > getVertexSet() const;
-	int getNumVertex() const;
-	vector<Vertex<T>*> getSources() const;
-	void resetIndegrees();
-	vector<T> topologicalOrder();
-	bool isDAG();
-	int dfsVisit() const;
-	void dfs(Vertex<T> *v, int &res);
-
 };
 
-template <class T>
-int Graph<T>::getNumVertex() const {
-	return vertexSet.size();
-}
-template <class T>
-vector<Vertex<T> * > Graph<T>::getVertexSet() const {
-	return vertexSet;
-}
 
 template <class T>
 bool Graph<T>::addVertex(const T &in) {
@@ -112,6 +101,7 @@ bool Graph<T>::addVertex(const T &in) {
 	vertexSet.push_back(v1);
 	return true;
 }
+
 
 template <class T>
 bool Graph<T>::removeVertex(const T &in) {
@@ -133,6 +123,7 @@ bool Graph<T>::removeVertex(const T &in) {
 	return false;
 }
 
+
 template <class T>
 bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
 	typename vector<Vertex<T>*>::iterator it= vertexSet.begin();
@@ -152,6 +143,7 @@ bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
 	return true;
 }
 
+
 template <class T>
 bool Graph<T>::removeEdge(const T &sourc, const T &dest) {
 	typename vector<Vertex<T>*>::iterator it= vertexSet.begin();
@@ -170,139 +162,4 @@ bool Graph<T>::removeEdge(const T &sourc, const T &dest) {
 }
 
 
-template <class T>
-vector<T> Graph<T>::dfs() const {
-	typename vector<Vertex<T>*>::const_iterator it= vertexSet.begin();
-	typename vector<Vertex<T>*>::const_iterator ite= vertexSet.end();
-	for (; it !=ite; it++)
-		(*it)->visited=false;
-	vector<T> res;
-	it=vertexSet.begin();
-	for (; it !=ite; it++)
-		if ( (*it)->visited==false )
-			dfs(*it,res);
-	return res;
-}
-
-template <class T>
-void Graph<T>::dfs(Vertex<T> *v,vector<T> &res) const {
-	v->visited = true;
-	res.push_back(v->info);
-	typename vector<Edge<T> >::iterator it= (v->adj).begin();
-	typename vector<Edge<T> >::iterator ite= (v->adj).end();
-	for (; it !=ite; it++)
-		if ( it->dest->visited == false )
-			dfs(it->dest, res);
-}
-
-template <class T>
-vector<T> Graph<T>::bfs(Vertex<T> *v) const {
-	vector<T> res;
-	queue<Vertex<T> *> q;
-	q.push(v);
-	v->visited = true;
-	while (!q.empty()) {
-		Vertex<T> *v1 = q.front();
-		q.pop();
-		res.push_back(v1->info);
-		typename vector<Edge<T> >::iterator it=v1->adj.begin();
-		typename vector<Edge<T> >::iterator ite=v1->adj.end();
-		for (; it!=ite; it++) {
-			Vertex<T> *d = it->dest;
-			if (d->visited==false) {
-				d->visited=true;
-				q.push(d);
-			}
-		}
-	}
-	return res;
-}
-
-template <class T>
-int Graph<T>::maxNewChildren(Vertex<T> *v, T &inf) const {
-	vector<T> res;
-	queue<Vertex<T> *> q;
-	queue<int> level;
-	int maxChildren=0;
-	inf =v->info;
-	q.push(v);
-	level.push(0);
-	v->visited = true;
-	while (!q.empty()) {
-		Vertex<T> *v1 = q.front();
-		q.pop();
-		res.push_back(v1->info);
-		int l=level.front();
-		level.pop(); l++;
-		int nChildren=0;
-		typename vector<Edge<T> >::iterator it=v1->adj.begin();
-		typename vector<Edge<T> >::iterator ite=v1->adj.end();
-		for (; it!=ite; it++) {
-			Vertex<T> *d = it->dest;
-			if (d->visited==false) {
-				d->visited=true;
-				q.push(d);
-				level.push(l);
-				nChildren++;
-			}
-		}
-		if (nChildren>maxChildren) {
-			maxChildren=nChildren;
-			inf = v1->info;
-		}
-	}
-	return maxChildren;
-}
-
-
-template <class T>
-int Vertex<T>::getIndegree() const{
-	return this->indegree;
-}
-
-template <class T>
-void Graph<T>::resetIndegrees() {
-
-	for(unsigned int i = 0; i < vertexSet.size(); i++) vertexSet[i]->indegree = 0;
-
-	for(unsigned int i = 0; i < vertexSet.size(); i++) {
-
-		for(unsigned int j = 0; j < vertexSet[i]->adj.size(); j++) {
-			vertexSet[i]->adj[j].dest->indegree++;
-		}
-	}
-}
-
-template<class T>
-vector<Vertex<T>*> Graph<T>::getSources() const{
-	vector< Vertex<T>* > sources;
-		for(unsigned int i = 0; i < vertexSet.size(); i++) {
-			if( vertexSet[i]->indegree == 0 ) sources.push_back( vertexSet[i] );
-		}
-		return sources;
-}
-
-
-
-template<class T>
-bool Graph<T>::isDAG(){
-
-}
-
-
-
-
-
-template<class T>
-vector<T> Graph<T>::topologicalOrder(){
-}
-
-template<class T>
-int dfsVisit() const;
-
-/*
- * 	int dfsVisit() const;
-	void dfs(Vertex<T> *v, int &res);
-	*/
- */
 #endif /* GRAPH_H_ */
