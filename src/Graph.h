@@ -16,6 +16,7 @@ template <class T> class Graph;
 template <class T>
 class Vertex {
 	T info;
+	bool visited;
 	vector<Edge<T>  > adj;
 	void addEdge(Vertex<T> *dest, double w);
 	bool removeEdgeTo(Vertex<T> *d);
@@ -54,6 +55,8 @@ void Vertex<T>::addEdge(Vertex<T> *dest, double w) {
 	adj.push_back(edgeD);
 }
 
+template <class T>
+Vertex<T>::Vertex(T in):info(in), visited(false){}
 
 template <class T>
 class Edge {
@@ -80,6 +83,7 @@ class Graph {
 	int daily_time;
 	int **W;
 	int **P;
+
 public:
 	bool addVertex(const T &in);
 	bool addEdge(const T &sourc, const T &dest, double w);
@@ -91,6 +95,7 @@ public:
 	string getInfo(Vertex<T> city);
 	int edgeCost(int vOrigIndex, int vDestIndex);
 	double getTravelTime(Vertex<T> from, Vertex<T> to);
+	int** getW();
 
 
 };
@@ -217,6 +222,11 @@ int Graph<T>::edgeCost(int vOrigIndex, int vDestIndex)
 	return INT_MAX;
 }
 
+
+template <class T>
+int** Graph<T>::getW(){
+	return W;
+}
 
 
 #endif /* GRAPH_H_ */

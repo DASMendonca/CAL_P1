@@ -6,14 +6,51 @@
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 
-#include <cstdio>
-#include "graphviewer.h"
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include "Graph.h"
+#include "CAL_P1.h"
 
 int main() {
+
+	//graphGenerator();
+	//graphViewerTest();
+
+	return 0;
+}
+
+
+
+
+//City(string name, bool flying, bool rest, double visit_time);
+void graphGenerator(){
+
+	Graph<City> travel;
+
+	City c1("Etosha National Park", false, true, 4);
+	City c2("Damaraland", false, false, 2);
+	City c3("Swakopmund", false, true, 4);
+	City c4("Waterberg", false, true, 0);
+	City c5("Windhoek", true, true, 0);
+	City c6("Walvis Bay", false, true, 1);
+
+	travel.addVertex(c1); travel.addVertex(c2);
+	travel.addVertex(c3); travel.addVertex(c4);
+	travel.addVertex(c5); travel.addVertex(c6);
+
+	travel.addEdge(c1,c2,2);	//etosha to damaraland
+	travel.addEdge(c1,c4,4);	//etosha to waterberg
+	travel.addEdge(c2,c3,3);	//damaraland to swakopmund
+	travel.addEdge(c2,c5,4);	//damaraland to windhoek
+	travel.addEdge(c3,c6,1);	//swakopmund to walvis
+	travel.addEdge(c3,c5,5);	//swakopmund to windhoek
+	travel.addEdge(c4,c5,2);	//waterberg to windhoek
+	travel.addEdge(c5,c6,5);	//windhoek to walvis
+
+	travel.floydWarshallShortestPath();
+
+
+}
+
+
+void graphViewerTest(){
 	GraphViewer *gv = new GraphViewer(600, 600, true);
 	gv->createWindow(600, 600);
 	gv->defineVertexColor("blue");
@@ -48,5 +85,14 @@ int main() {
 	gv->setEdgeLabel(7, "1h");
 	gv->rearrange();
 	getchar();
-	return 0;
+}
+
+
+void floydWarshallTester(int **W, int square_size){
+	for(int i =0; i<square_size; i++)
+	{
+		for(int j=0; j<square_size; j++)
+			cout<<W[i][j]<<" ";
+		cout<<endl;
+	}
 }
