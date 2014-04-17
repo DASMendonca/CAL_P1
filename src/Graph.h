@@ -16,15 +16,18 @@ class Vertex {
 	T info;
 	vector<Edge<T>  > adj;
 	bool visited;
-	bool interest_point;
-	bool resting_point;
+	bool interest;
+	bool resting;
+	bool airport;
+	double spending_time;
+
 	void addEdge(Vertex<T> *dest, double w);
 	bool removeEdgeTo(Vertex<T> *d);
 
 public:
-	Vertex(T in);
+	Vertex(T in, bool airport);
+	Vertex(T in, bool flying, bool rest, double visit_time);
 	friend class Graph<T>;
-	int getIndegree() const;
 	T getInfo() const;
 };
 
@@ -46,7 +49,10 @@ bool Vertex<T>::removeEdgeTo(Vertex<T> *d) {
 
 /*Vertex Constructor*/
 template <class T>
-Vertex<T>::Vertex(T in): info(in), visited(false){}
+Vertex<T>::Vertex(T in, bool flying): info(in), visited(false), interest(false), resting(true), spending_time(0), airport(flying){}
+
+template <class T>
+Vertex<T>::Vertex(T in, bool flying, bool rest, double visit_time): info(in), visited(false), interest(true), resting(rest), spending_time(visit_time), airport(flying){}
 
 
 template <class T>
@@ -72,6 +78,7 @@ public:
 	friend class Vertex<T>;
 };
 
+
 /*Edge Constructor*/
 template <class T>
 Edge<T>::Edge(Vertex<T> *d, double w): dest(d), weight(w){}
@@ -81,13 +88,13 @@ template <class T>
 class Graph {
 	vector<Vertex<T> *> path;
 	vector<Vertex<T> *> vertexSet;
-	vector<>
-	void dfs(Vertex<T> *v, vector<T> &res) const;
+	vector<vector<Edge<T>>  > travelling_costs;
 public:
 	bool addVertex(const T &in);
 	bool addEdge(const T &sourc, const T &dest, double w);
 	bool removeVertex(const T &in);
 	bool removeEdge(const T &sourc, const T &dest);
+	void updateEdges();
 };
 
 
@@ -161,5 +168,9 @@ bool Graph<T>::removeEdge(const T &sourc, const T &dest) {
 	return vS->removeEdgeTo(vD);
 }
 
+template <class T>
+void Graph<T>::updateEdges(){
+
+}
 
 #endif /* GRAPH_H_ */
