@@ -1,0 +1,21 @@
+backtracking:
+
+cidade_actual->
+	cidade_actual->visitada = true
+	if tempo_disponivel== 0
+		if cidade_actual-> repouso == true
+			tempo_disponivel= 10
+			dias++
+	
+	else if custo_todos_caminhos > tempo_disponivel
+		if cidade_actual->repouso == true
+			tempo_disponivel= 10
+			dias++
+		else
+			cidade_actual->visitada = false
+			return false
+
+	else if caminho_menor_custo < tempo_disponivel
+			cidade_actual = proxima_cidade
+			tempo_disponivel = tempo_disponivel - caminho_menor_custo
+			

@@ -17,18 +17,11 @@ template <class T>
 class Vertex {
 	T info;
 	vector<Edge<T>  > adj;
-	bool visited;
-	bool interest;
-	bool resting;
-	bool airport;
-	double spending_time;
-
 	void addEdge(Vertex<T> *dest, double w);
 	bool removeEdgeTo(Vertex<T> *d);
 
 public:
-	Vertex(T in, bool airport);
-	Vertex(T in, bool flying, bool rest, double visit_time);
+	Vertex(T in);
 	friend class Graph<T>;
 	T getInfo() const;
 };
@@ -47,14 +40,6 @@ bool Vertex<T>::removeEdgeTo(Vertex<T> *d) {
 	}
 	return false;
 }
-
-
-/*Vertex Constructor*/
-template <class T>
-Vertex<T>::Vertex(T in, bool flying): info(in), visited(false), interest(false), resting(true), spending_time(0), airport(flying){}
-
-template <class T>
-Vertex<T>::Vertex(T in, bool flying, bool rest, double visit_time): info(in), visited(false), interest(true), resting(rest), spending_time(visit_time), airport(flying){}
 
 
 template <class T>
