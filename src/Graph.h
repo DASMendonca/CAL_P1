@@ -88,7 +88,6 @@ template <class T>
 class Graph {
 	vector<Vertex<T> *> path;
 	vector<Vertex<T> *> vertexSet;
-	vector<vector<Edge<T>>  > travelling_costs;
 public:
 	bool addVertex(const T &in);
 	bool addEdge(const T &sourc, const T &dest, double w);
