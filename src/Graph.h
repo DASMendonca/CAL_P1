@@ -6,6 +6,8 @@
 
 #include <vector>
 #include <queue>
+#include <climits>
+#include <cmath>
 
 using namespace std;
 template <class T> class Edge;
@@ -88,13 +90,24 @@ template <class T>
 class Graph {
 	vector<Vertex<T> *> path;
 	vector<Vertex<T> *> vertexSet;
-	vector<vector<Edge<T>>  > travelling_costs;
+
+	int days;
+	int daily_time;
+	int **W;
+	int **P;
 public:
 	bool addVertex(const T &in);
 	bool addEdge(const T &sourc, const T &dest, double w);
 	bool removeVertex(const T &in);
 	bool removeEdge(const T &sourc, const T &dest);
 	void updateEdges();
+	void floydWarshallShortestPath();
+	void setDailyTime(int time_to_spend);
+	string getInfo(Vertex<T> city);
+	int edgeCost(int vOrigIndex, int vDestIndex);
+	double getTravelTime(Vertex<T> from, Vertex<T> to);
+
+
 };
 
 
@@ -168,9 +181,57 @@ bool Graph<T>::removeEdge(const T &sourc, const T &dest) {
 	return vS->removeEdgeTo(vD);
 }
 
-template <class T>
-void Graph<T>::updateEdges(){
+
+template<class T>
+void Graph<T>::floydWarshallShortestPath() {
+
+	W = new int * [vertexSet.size()];
+	P = new int * [vertexSet.size()];
+	for(unsigned int i = 0; i < vertexSet.size(); i++)
+	{
+		W[i] = new int[vertexSet.size()];
+		P[i] = new int[vertexSet.size()];
+		for(unsigned int j = 0; j < vertexSet.size(); j++)
+		{
+			W[i][j] = edgeCost(i,j);
+			P[i][j] = -1;
+		}
+	}
+
+
+	for(unsigned int k = 0; k < vertexSet.size(); k++)
+		for(unsigned int i = 0; i < vertexSet.size(); i++)
+			for(unsigned int j = 0; j < vertexSet.size(); j++)
+			{
+				if(W[i][k] == INT_MAX || W[k][j] == INT_MAX)
+					continue;
+
+				int val = min ( W[i][j], W[i][k]+W[k][j] );
+				if(val != W[i][j])
+				{
+					W[i][j] = val;
+					P[i][j] = k;
+				}
+			}
 
 }
+
+
+template<class T>
+int Graph<T>::edgeCost(int vOrigIndex, int vDestIndex)
+{
+	if(vertexSet[vOrigIndex] == vertexSet[vDestIndex])
+		return 0;
+
+	for(unsigned int i = 0; i < vertexSet[vOrigIndex]->adj.size(); i++)
+	{
+		if(vertexSet[vOrigIndex]->adj[i].dest == vertexSet[vDestIndex])
+			return vertexSet[vOrigIndex]->adj[i].weight;
+	}
+
+	return INT_MAX;
+}
+
+
 
 #endif /* GRAPH_H_ */
