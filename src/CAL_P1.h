@@ -15,7 +15,8 @@
 #include <sstream>
 #include "Graph.h"
 #include "City.h"
-
+#include "parser.h"
+#include <algorithm>
 
 
 void graphGenerator();
@@ -23,5 +24,11 @@ void graphGenerator();
 void graphViewerTest();
 
 void floydWarshallTester(int **W, int square_size);
+
+Graph<City> loadGraph();
+
+bool stringtobool(string toConvert);
+
+void drawGraph(Graph<City> toDraw);
 
 #endif /* CAL_P1_H_ */
