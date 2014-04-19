@@ -10,14 +10,97 @@
 
 int main() {
 
-	graphGenerator();
+	Graph<City> test;
+	test = loadGraph();
+	drawGraph(test);
+	//graphGenerator();
 	//graphViewerTest();
 
 	return 0;
 }
 
+//Draws any Graph as long as it's a valid Graph<City>
+//TODO: color coding
+void drawGraph(Graph<City> toDraw) {
+	GraphViewer *gv = new GraphViewer(600, 600, true);
+	gv->createWindow(600, 600);
+	gv->defineVertexColor("blue");
+	gv->defineEdgeColor("black");
+	for (unsigned int i = 0; i < toDraw.getVertexSet().size(); i++) {
+		gv->addNode(i);
+		gv->setVertexLabel(i, toDraw.getVertexSet()[i]->getInfo().getName());
+	}
+	int edgecount = 0;
+	vector<vector<int> > added;
+	vector<int> temp;
+	for (unsigned int i = 0; i < toDraw.getVertexSet().size(); i++) {
+		for (unsigned int j = 0; j < toDraw.getVertexSet()[i]->getAdj().size(); j++) {
+			for (unsigned int k = 0; k < toDraw.getVertexSet().size(); k++) {
+				if (toDraw.getVertexSet()[k]->getInfo() == toDraw.getVertexSet()[i]->getAdj()[j].getDest().getInfo()) {
+					string result;
+					stringstream convert;
+					convert << toDraw.getVertexSet()[i]->getAdj()[j].getWeight();
+					result = convert.str();
+					if (result != "0") {
+						bool duplicate = false;
+						for (unsigned int n = 0; n < added.size(); n++) {
+							if (added[n][1] == i && added[n][0] == k) {
+								duplicate = true;
+							}
+						}
+						if (!duplicate) {
+							gv -> addEdge(edgecount, i, k, EdgeType::UNDIRECTED);
+							gv -> setEdgeLabel(edgecount, result);
+							edgecount++;
+							temp.clear();
+							temp.push_back(i);
+							temp.push_back(k);
+							added.push_back(temp);
+						}
+					}
+				}
+			}
+		}
+	}
+	gv->rearrange();
+	getchar();
+}
 
+//Loads a graph from a edge + vertex file
+Graph<City> loadGraph() {
+	Graph<City> toLoad;
+	vector<vector<string> > vertexes;
+	vector<vector<string> > edges;
+	vertexes = readVertex("vertex.csv"); //TEMP HARDCODED FILENAME
+	edges = readEdge("edge.csv", vertexes.size()); //TEMP HARDCODED FILENAME
+	for (unsigned int i = 0; i < vertexes.size(); i++) {
+		int result;
+		stringstream convert(vertexes[i][3]);
+		convert >> result;
+		toLoad.addVertex(City(vertexes[i][0], stringtobool(vertexes[i][1]), stringtobool(vertexes[i][1]), result));
+	}
+	for (unsigned int i = 0; i < edges.size(); i++) {
+		for (unsigned int j = 0; j < edges[i].size(); j++) {
+			double result;
+			stringstream convert(edges[i][j]);
+			convert >> result;
+			if (result != 0) {
+				toLoad.addEdge(toLoad.getVertexSet()[i]->getInfo(), toLoad.getVertexSet()[j]->getInfo(), result);
+			}
+		}
+	}
+	return toLoad;
+}
 
+//Converts a string to a boolean value
+bool stringtobool(string toConvert) {
+	transform(toConvert.begin(), toConvert.end(), toConvert.begin(), ::tolower);
+	if (toConvert == "0" || toConvert == "false") {
+		return false;
+	} else if (toConvert == "1" || toConvert == "true") {
+		return true;
+	} else return -1;
+}
 
 //City(string name, bool flying, bool rest, double visit_time);
 void graphGenerator(){

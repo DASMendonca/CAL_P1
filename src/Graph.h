@@ -25,8 +25,13 @@ public:
 	Vertex(T in);
 	friend class Graph<T>;
 	T getInfo() const;
+	vector<Edge<T> > getAdj();
 };
 
+template <class T>
+vector<Edge<T> > Vertex<T>::getAdj() {
+	return adj;
+}
 
 template <class T>
 bool Vertex<T>::removeEdgeTo(Vertex<T> *d) {
@@ -66,8 +71,19 @@ public:
 	Edge(Vertex<T> *d, double w);
 	friend class Graph<T>;
 	friend class Vertex<T>;
+	Vertex<T> getDest();
+	double getWeight();
 };
 
+template <class T>
+Vertex<T> Edge<T>::getDest() {
+	return *dest;
+}
+
+template <class T>
+double Edge<T>::getWeight() {
+	return weight;
+}
 
 /*Edge Constructor*/
 template <class T>
@@ -96,12 +112,21 @@ public:
 	int edgeCost(int vOrigIndex, int vDestIndex);
 	double getTravelTime(Vertex<T> from, Vertex<T> to);
 	int** getW();
+<<<<<<< HEAD
 	void setDaily_time(int time);
 	int getDailyTime();
 	vector<Vertex<T> > getSolution();
+=======
+	vector<Vertex<T> *> getVertexSet();
+>>>>>>> a39ebfbda4d13841fd939536951b94a7bcdc1521
 
 
 };
+
+template <class T>
+vector<Vertex<T> *> Graph<T>::getVertexSet() {
+	return vertexSet;
+}
 
 
 template <class T>
