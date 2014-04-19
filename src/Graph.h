@@ -76,7 +76,7 @@ Edge<T>::Edge(Vertex<T> *d, double w): dest(d), weight(w){}
 
 template <class T>
 class Graph {
-	vector<Vertex<T> *> path;
+	vector<Vertex<T> *> solution;
 	vector<Vertex<T> *> vertexSet;
 
 	int days;
@@ -96,6 +96,9 @@ public:
 	int edgeCost(int vOrigIndex, int vDestIndex);
 	double getTravelTime(Vertex<T> from, Vertex<T> to);
 	int** getW();
+	void setDaily_time(int time);
+	int getDailyTime();
+	vector<Vertex<T> > getSolution();
 
 
 };
@@ -227,6 +230,8 @@ template <class T>
 int** Graph<T>::getW(){
 	return W;
 }
+
+
 
 
 #endif /* GRAPH_H_ */

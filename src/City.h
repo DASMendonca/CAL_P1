@@ -30,9 +30,6 @@ public:
 	int getVisitTime();
 	string getName();
 
-	void setVisited();
-	void setNotVisited();
-
 	bool operator == (const City &c2) const;
 	friend ostream & operator << (ostream &os, City &c);
 

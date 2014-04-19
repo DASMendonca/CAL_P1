@@ -20,13 +20,6 @@ City::City(string name, bool flying, bool rest, int visit_time):name(name), airp
 
 City:: ~City(){}
 
-void City::setVisited(){
-	visited = true;
-}
-
-void City::setNotVisited(){
-	visited= false;
-}
 
 int City::getVisitTime(){
 	return visit_time;
