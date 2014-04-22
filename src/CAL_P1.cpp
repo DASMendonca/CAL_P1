@@ -11,9 +11,9 @@
 int main() {
 
 	Graph<City> test;
-	test = loadGraph();
-	drawGraph(test);
-	//graphGenerator();
+	//test = loadGraph();
+	//drawGraph(test);
+	graphGenerator();
 	//graphViewerTest();
 
 	return 0;
@@ -130,6 +130,7 @@ void graphGenerator(){
 	travel.floydWarshallShortestPath();
 
 	floydWarshallTester(travel.getW(), 6);
+	travel.testerfunction();
 
 
 }
