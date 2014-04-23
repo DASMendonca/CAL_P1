@@ -381,12 +381,9 @@ bool Graph<T>::landAndBegin(int daily_time){
 	for(; it!=ite; it++){
 		if((*it)->info->hasAirport())
 		{
-			available_time -=(*it)->info->getVisitTime();
 			if((is_possible=selectAction(index)))
 				break;
 			else{
-				solution.pop_back();
-				(*it)->unsetVisited();
 				available_time = daily_time;
 			}
 		}
@@ -573,6 +570,7 @@ bool Graph<T>::visitGo(int city_index){
 	int tmp_av_time = available_time;
 	available_time -= visit_time;
 	solution.push_back(vertexSet[city_index]);
+	vertexSet[city_index]->setVisited();
 
 	vector<int> unvisited_ip = getIpUnvisited();
 	vector<int> city_tc = cityTravelCosts(city_index);
@@ -591,6 +589,7 @@ bool Graph<T>::visitGo(int city_index){
 		return true;
 
 
+	vertexSet[city_index]->unsetVisited();
 	available_time = tmp_av_time;
 	days--;
 	solution.pop_back();
