@@ -390,6 +390,8 @@ bool Graph<T>::landAndBegin(int daily_time){
 		index++;
 	}
 	//TODO back to airport again
+
+	return is_possible;
 }
 
 
@@ -478,7 +480,7 @@ vector<int> Graph<T>::cityTravelCosts(int city_index){
 		if(vertexSet[i]->info.isInterestPoint() && !vertexSet[i]->isVisited() && i != city_index)
 			city_tc.push_back( W[city_index][i]);
 		else
-			city_tc.push_back[INT_MAX];
+			city_tc.push_back(INT_MAX);
 	}
 	return city_tc;
 }

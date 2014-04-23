@@ -31,8 +31,8 @@ void drawGraph(Graph<City> toDraw) {
 		gv->setVertexLabel(i, toDraw.getVertexSet()[i]->getInfo().getName());
 	}
 	int edgecount = 0;
-	vector<vector<int> > added;
-	vector<int> temp;
+	vector<vector<unsigned int> > added;
+	vector<unsigned int> temp;
 	for (unsigned int i = 0; i < toDraw.getVertexSet().size(); i++) {
 		for (unsigned int j = 0; j < toDraw.getVertexSet()[i]->getAdj().size(); j++) {
 			for (unsigned int k = 0; k < toDraw.getVertexSet().size(); k++) {
