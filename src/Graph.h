@@ -162,9 +162,17 @@ public:
 	bool removeVertex(const T &in);
 	bool removeEdge(const T &sourc, const T &dest);
 	bool allVisited();
-	bool findNextCity(Vertex<T> *city, int &present_index);
-	bool findRestPlaceFrom(int index);
+
+	bool landAndBegin(int daily_time);
+	bool findNextCity(Vertex<T> *city, int present_index);
+	bool selectAction(int city_index);
 	bool visitFromIpRp(int city_index);
+	bool visitFromRp(int city_index, int next_index);
+	bool visitRestGo(int city_index);
+	bool visitGo(int city_index);
+	bool restGo(int city_index);
+	bool travel(vector<int> destinations, int city_index);
+
 
 
 	void updateEdges();
@@ -173,9 +181,8 @@ public:
 	void setDaily_time(int time);
 	void restoreAvailableTime();
 	void mapAirports();
-	void landAndBegin(int daily_time);
 	void testerfunction();
-
+	void filterAndOrder(vector<int> unvisited_ip, vector<int> city_tc);
 	string getInfo(Vertex<T> city);
 
 	int edgeCost(int vOrigIndex, int vDestIndex);
@@ -184,12 +191,14 @@ public:
 	int findIndexVertex(string info);
 
 	int** getW();
-	int* cityTravelCosts(int city_index);
-	int* restingTravelCosts(int city_index);
 	vector<Vertex<T> > getSolution();
 	vector<Vertex<T> *> getVertexSet();
 	vector<int> getBestCityTo(int city_index);
 	vector<int> getIpUnvisited();
+	vector<int> getRestingPlaces();
+	vector<int> cityTravelCosts(int city_index);
+	vector<int> restingTravelCosts(int city_index);
+	vector<int> getCostsFrom(vector<int> citys);
 };
 
 
@@ -359,7 +368,7 @@ void Graph<T>::restoreAvailableTime(){
 
 
 template <class T>
-void Graph<T>::landAndBegin(int daily_time){
+bool Graph<T>::landAndBegin(int daily_time){
 	this->daily_time = daily_time;
 	available_time = daily_time;
 	floydWarshallShortestPath();
@@ -373,9 +382,7 @@ void Graph<T>::landAndBegin(int daily_time){
 		if((*it)->info->hasAirport())
 		{
 			available_time -=(*it)->info->getVisitTime();
-			(*it)->setVisited();
-			solution.push_back(it);
-			if((is_possible=findNextCity(it, index)))
+			if((is_possible=selectAction(index)))
 				break;
 			else{
 				solution.pop_back();
@@ -390,7 +397,36 @@ void Graph<T>::landAndBegin(int daily_time){
 
 
 template <class T>
-bool Graph<T>::findNextCity(Vertex<T> *city, int &index){
+bool Graph<T>::selectAction(int city_index){
+	bool isIp = vertexSet[city_index]->info.isInterestPoint();
+	bool isRp = vertexSet[city_index]->info.isRestingPlace();
+	bool visited = vertexSet[city_index]->isVisited();
+
+	bool possible = false;
+
+	if(isIp)
+	{
+		if(!visited)
+		{
+			if(isRp)
+				possible = visitRestGo(city_index);	//it may not be needed to rest
+			else
+				possible = visitGo(city_index);
+		}
+		else if(isRp)
+			possible = restGo(city_index);
+	}
+	else
+	{
+		possible = restGo(city_index);
+	}
+
+	return possible;
+}
+
+
+template <class T>
+bool Graph<T>::findNextCity(Vertex<T> *city, int index){
 
 	if(! vertexSet[index]->info.isInterestPoint)
 		restoreAvailableTime();
@@ -434,30 +470,36 @@ void Graph<T>::testerfunction(){
 }
 
 
+/*
+ *returns an array with the costs to unvisited Interest Points, visited ones and non IP also in but with INT_MAX
+ */
 template <class T>
-int* Graph<T>::cityTravelCosts(int city_index){
+vector<int> Graph<T>::cityTravelCosts(int city_index){
+	vector<int> city_tc;
 	int size =vertexSet.size();
-	int city_tc[size];
 	for(int i =0; i<size; i++){
-		if(vertexSet[i]->info.isInterestPoint() && !vertexSet[i]->isVisited())
-			city_tc[i]= W[city_index][i];
+		if(vertexSet[i]->info.isInterestPoint() && !vertexSet[i]->isVisited() && i != city_index)
+			city_tc.push_back( W[city_index][i]);
 		else
-			city_tc[i]= INT_MAX;
+			city_tc.push_back[INT_MAX];
 	}
 	return city_tc;
 }
 
 
+/*
+ *returns an array with the costs to every resting place, non rps also in but with INT_MAX
+ */
 template<class T>
-int* Graph<T>::restingTravelCosts(int city_index){
+vector<int> Graph<T>::restingTravelCosts(int city_index){
 	int size =vertexSet.size();
-	int resting_tc[size];
+	vector<int> resting_tc;
 	for(int i =0; i<size; i++){
-			if(vertexSet[i]->info.isRestingPlace())
-				resting_tc[i]= W[city_index][i];
-			else
-			resting_tc[i]= INT_MAX;
-		}
+		if(vertexSet[i]->info.isRestingPlace())
+			resting_tc.push_back(W[city_index][i]);
+		else
+			resting_tc.push_back(INT_MAX);
+	}
 	return resting_tc;
 }
 
@@ -466,11 +508,22 @@ template <class T>
 vector<int> Graph<T>::getIpUnvisited(){
 	// return a vector with interest points yet to visit
 	vector<int> ip_u;
-	for(int i =0; i<vertexSet.size(); i++){
+	for(int i =0; i<vertexSet.size(); i++)
 		if(vertexSet[i]->info.isInterestPoint() && !vertexSet[i]->info.isVisited())
 			ip_u.push_back(i);
-	}
+
 	return ip_u;
+}
+
+
+template <class T>
+vector<int> Graph<T>::getRestingPlaces(){
+	vector<int> rp;
+	for(int i = 0; i<vertexSet.size(); i++)
+		if(vertexSet[i]->info.isRestingPlace())
+			rp.push_back(i);
+
+	return rp;
 }
 
 
@@ -486,6 +539,117 @@ vector<int> Graph<T>::getBestCityTo(int city_index){
 		citys_index.push_back(order_by_cost[i]);
 
 	return citys_index;
+}
+
+
+template <class T>
+bool Graph<T>::restGo(int city_index){
+	int tmp_available_time= available_time;
+	available_time = daily_time;
+	days++;
+	solution.push_back(vertexSet[city_index]);
+
+	vector<int> unvisited_ip = getIpUnvisited();
+	vector<int> city_tc = cityTravelCosts(city_index);
+	filterAndOrder(unvisited_ip, city_tc);
+	//now we have the unvisited_ip ordered by the least costing travel
+
+	if(travel(unvisited_ip, city_index))
+		return true;
+
+	available_time = tmp_available_time;
+	days--;
+	solution.pop_back();
+	return false;
+}
+
+
+template <class T>
+bool Graph<T>::visitGo(int city_index){
+	int visit_time = vertexSet[city_index]->info.getVisitTime();
+	if(available_time < visit_time)
+		return false;
+
+	int tmp_av_time = available_time;
+	available_time -= visit_time;
+	solution.push_back(vertexSet[city_index]);
+
+	vector<int> unvisited_ip = getIpUnvisited();
+	vector<int> city_tc = cityTravelCosts(city_index);
+	filterAndOrder(unvisited_ip, city_tc);
+	//now we have the unvisited_ip ordered by the least costing travel
+
+	if(travel(unvisited_ip, city_index))
+		return true;
+
+	//but now, we may have a resting place near, and using it may be usefull
+	unvisited_ip = getRestingPlaces();
+	city_tc = restingTravelCosts(city_index);
+	filterAndOrder(unvisited_ip, city_tc);
+
+	if(travel(unvisited_ip, city_index))
+		return true;
+
+
+	available_time = tmp_av_time;
+	days--;
+	solution.pop_back();
+
+	return false;
+
+}
+
+
+template <class T>
+bool Graph<T>::travel(vector<int> destinations, int city_index){
+
+	for(int i =0; i<destinations.size(); i++){
+		int travel_time = W[city_index][destinations[i]];
+		if(available_time < travel_time)
+			break;
+
+		available_time -= travel_time;
+
+		if(selectAction(destinations[i]))
+			return true;
+
+		else
+			available_time+=travel_time;
+	}
+
+	return false;
+}
+
+
+template <class T>
+void Graph<T>::filterAndOrder(vector<int> destinations, vector<int> city_tc){
+	int control = destinations[0];
+	int ctr_it = 0;
+
+	for(int i =0; i<city_tc.size(); i++){
+		if(i != control)
+		{
+			city_tc.erase(city_tc.begin() + i);
+		}
+		else{
+			ctr_it++;
+			control = destinations[ctr_it];
+		}
+	}
+
+	for(int i =0; i<destinations.size(); i++){
+		for(int j =0; j<destinations.size(); j++){
+			if(city_tc[j] < city_tc[i]){
+				int tmp = city_tc[i];
+				city_tc[i] = city_tc[j];
+				city_tc[j] = tmp;
+				tmp = destinations[i];
+				destinations[i] = destinations[j];
+				destinations[j] = tmp;
+
+			}
+		}
+	}
 }
 
 

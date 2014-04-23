@@ -14,7 +14,7 @@ using namespace std;
 
 void quicksortIndex(int arr[], int size);
 
-void quickSortIndex(vector<int> vec);
+void quickSortIndex(vector<int> index, vector<int> vals);
 
 int* getMatrixColumn(int** matrix, int column_index, int nr_rows);
 
