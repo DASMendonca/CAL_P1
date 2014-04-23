@@ -147,7 +147,6 @@ template <class T>
 class Graph {
 	vector<Vertex<T> *> solution;
 	vector<Vertex<T> *> vertexSet;
-	vector<Vertex<T> *> airport_citys;
 
 	int days;
 	int daily_time;
@@ -161,10 +160,9 @@ public:
 	bool addEdge(const T &sourc, const T &dest, double w);
 	bool removeVertex(const T &in);
 	bool removeEdge(const T &sourc, const T &dest);
-	bool allVisited();
 
+	bool allVisited();
 	bool landAndBegin(int daily_time);
-	bool findNextCity(Vertex<T> *city, int present_index);
 	bool selectAction(int city_index);
 	bool visitFromIpRp(int city_index);
 	bool visitFromRp(int city_index, int next_index);
@@ -172,15 +170,13 @@ public:
 	bool visitGo(int city_index);
 	bool restGo(int city_index);
 	bool travel(vector<int> destinations, int city_index);
+	bool toAirportFrom(int city_index);
 
 
 
 	void updateEdges();
 	void floydWarshallShortestPath();
 	void setDailyTime(int time_to_spend);
-	void setDaily_time(int time);
-	void restoreAvailableTime();
-	void mapAirports();
 	void testerfunction();
 	void filterAndOrder(vector<int> unvisited_ip, vector<int> city_tc);
 	string getInfo(Vertex<T> city);
@@ -196,9 +192,11 @@ public:
 	vector<int> getBestCityTo(int city_index);
 	vector<int> getIpUnvisited();
 	vector<int> getRestingPlaces();
+	vector<int> getAirportCitys();
 	vector<int> cityTravelCosts(int city_index);
 	vector<int> restingTravelCosts(int city_index);
-	vector<int> getCostsFrom(vector<int> citys);
+	vector<int> getCostsFromTo(int city_index, vector<int> destinations)
+
 };
 
 
@@ -337,17 +335,6 @@ int** Graph<T>::getW(){
 
 
 template <class T>
-void Graph<T>::mapAirports(){
-	typename vector<Vertex<T>*>::iterator it= vertexSet.begin();
-	typename vector<Vertex<T>*>::iterator ite= vertexSet.end();
-
-	for(; it!=ite; it++)
-		if((*it)->info->hasAirport())
-			airport_citys.pushback(*it);
-}
-
-
-template <class T>
 bool Graph<T>::allVisited(){
 	typename vector<Vertex<T> *>::iterator it = vertexSet.begin();
 	typename vector<Vertex<T> *>::iterator ite= vertexSet.end();
@@ -357,13 +344,6 @@ bool Graph<T>::allVisited(){
 			return false;
 
 	return true;
-}
-
-
-template <class T>
-void Graph<T>::restoreAvailableTime(){
-	available_time = daily_time;
-	days++;
 }
 
 
@@ -421,32 +401,6 @@ bool Graph<T>::selectAction(int city_index){
 	}
 
 	return possible;
-}
-
-
-template <class T>
-bool Graph<T>::findNextCity(Vertex<T> *city, int index){
-
-	if(! vertexSet[index]->info.isInterestPoint)
-		restoreAvailableTime();
-
-	if(allVisited())
-		return true;
-
-
-
-	int size = vertexSet.size();
-
-	int *shortest_travel= cityTravelCosts(index);
-	quicksortIndex(shortest_travel, size);
-
-	bool is_possible = false;
-
-	for(int i= 0; i<size; i++)
-	{
-
-	}
-
 }
 
 
@@ -527,6 +481,17 @@ vector<int> Graph<T>::getRestingPlaces(){
 
 
 template <class T>
+vector<int> Graph<T>::getAirportCitys(){
+	vector<int> ac;
+	for(int i = 0; i<vertexSet.size(); i++)
+		if(vertexSet[i]->info.hasAirport())
+			ac.push_back(i);
+
+	return ac;
+}
+
+
+template <class T>
 vector<int> Graph<T>::getBestCityTo(int city_index){
 	int size = vertexSet.size();
 	int *order_by_cost;
@@ -538,6 +503,16 @@ vector<int> Graph<T>::getBestCityTo(int city_index){
 		citys_index.push_back(order_by_cost[i]);
 
 	return citys_index;
+}
+
+template <class T>
+vector<int> Graph<T>::getCostsFromTo(int city_index, vector<int> destinations){
+	vector<int> costs;
+	for(int i=0; i<destinations.size(); i++)
+	{
+		costs.push_back(W[city_index][destinations[i]]);
+	}
+	return costs;
 }
 
 
@@ -574,6 +549,11 @@ bool Graph<T>::visitGo(int city_index){
 	solution.push_back(vertexSet[city_index]);
 	vertexSet[city_index]->setVisited();
 
+	if(allVisited()){
+		//todo
+		return true;
+	}
+
 	vector<int> unvisited_ip = getIpUnvisited();
 	vector<int> city_tc = cityTravelCosts(city_index);
 	filterAndOrder(unvisited_ip, city_tc);
@@ -593,11 +573,67 @@ bool Graph<T>::visitGo(int city_index){
 
 	vertexSet[city_index]->unsetVisited();
 	available_time = tmp_av_time;
-	days--;
 	solution.pop_back();
 
 	return false;
 
+}
+
+
+template <class T>
+bool Graph<T>::visitRestGo(int city_index){
+	int visit_time = vertexSet[city_index]->info.getVisitTime();
+	int tmp_av_time = available_time;
+
+	//as it is a resting place, it certanly will be possible to visit
+	solution.push_back(vertexSet[city_index]);
+	vertexSet[city_index]->setVisited();
+
+	vector<int> unvisited_ip = getIpUnvisited();
+	vector<int> city_tc = cityTravelCosts(city_index);
+	filterAndOrder(unvisited_ip, city_tc);
+
+
+
+	if(available_time > visit_time)
+	{
+		available_time -= visit_time;
+		if(allVisited()){
+			//todo
+			return true;
+		}
+
+
+		if(travel(unvisited_ip, city_index))
+			return true;
+		else
+		{
+			available_time = daily_time;
+			days++;
+			if(travel(unvisited_ip, city_index))
+				return true;
+		}
+	}
+	else
+	{
+		available_time = daily_time;
+		days++;
+		available_time -= visit_time;
+
+		if(allVisited()){
+			//todo
+			return true;
+		}
+		if(travel(unvisited_ip, city_index))
+			return true;
+	}
+
+	vertexSet[city_index]->unsetVisited();
+	available_time = tmp_av_time;
+	days--;
+	solution.pop_back();
+
+	return false;
 }
 
 
@@ -623,11 +659,24 @@ bool Graph<T>::travel(vector<int> destinations, int city_index){
 
 
 template <class T>
+bool Graph<T>::toAirportFrom(int city_index){
+
+	vector<int> airport_citys = getAirportCitys();
+
+
+
+	return false;
+}
+
+
+template <class T>
 void Graph<T>::filterAndOrder(vector<int> destinations, vector<int> city_tc){
 	int control = destinations[0];
 	int ctr_it = 0;
 
-	for(int i =0; i<city_tc.size(); i++){
+	//filter
+	for(int i =0; i<city_tc.size(); i++)
+	{
 		if(i != control)
 		{
 			city_tc.erase(city_tc.begin() + i);
@@ -638,16 +687,17 @@ void Graph<T>::filterAndOrder(vector<int> destinations, vector<int> city_tc){
 		}
 	}
 
+	//order
 	for(int i =0; i<destinations.size(); i++){
 		for(int j =0; j<destinations.size(); j++){
-			if(city_tc[j] < city_tc[i]){
+			if(city_tc[j] < city_tc[i])
+			{
 				int tmp = city_tc[i];
 				city_tc[i] = city_tc[j];
 				city_tc[j] = tmp;
 				tmp = destinations[i];
 				destinations[i] = destinations[j];
 				destinations[j] = tmp;
-
 			}
 		}
 	}
