@@ -5,6 +5,7 @@ vector<vector<string> > readVertex(string filename) {
 	vector<vector<string> > vertexlist;
 	vector<string> temp;
 	string info;
+	if(file.good()) {getline(file, info); } //skips 1st line
 	while(file.good()) {
 		temp.clear();
 		for (int i = 0; i < 3; i++) {
@@ -26,10 +27,12 @@ vector<vector<string> > readEdge(string filename, int nvertex) {
 	string info;
 	while(file.good()) {
 		temp.clear();
-		for (int i = 0; i < nvertex; i++) {
-			getline(file, info);
+		for (int i = 0; i < nvertex-1; i++) {
+			getline(file, info, ';');
 			temp.push_back(info);
 		}
+		getline(file, info);
+		temp.push_back(info);
 		edgelist.push_back(temp);
 	}
 	file.close();

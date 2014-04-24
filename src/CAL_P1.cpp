@@ -10,10 +10,10 @@
 
 int main() {
 
-	//Graph<City> test;
-	//test = loadGraph();
-	//drawGraph(test);
-	graphGenerator();
+	Graph<City> test;
+	test = loadGraph();
+	drawGraph(test);
+	//graphGenerator();
 	//graphViewerTest();
 
 	return 0;
