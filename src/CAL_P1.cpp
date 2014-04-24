@@ -10,7 +10,7 @@
 
 int main() {
 
-	Graph<City> test;
+	//Graph<City> test;
 	//test = loadGraph();
 	//drawGraph(test);
 	graphGenerator();
@@ -103,6 +103,7 @@ bool stringtobool(string toConvert) {
 }
 
 //City(string name, bool flying, bool rest, double visit_time);
+//City(string name, bool flying, bool rest, int visit_time);
 void graphGenerator(){
 
 	Graph<City> travel;
@@ -112,7 +113,7 @@ void graphGenerator(){
 	City c3("Swakopmund", false, true, 4);
 	City c4("Waterberg", false, true, 0);
 	City c5("Windhoek", true, true, 0);
-	City c6("Walvis Bay", false, true, 1);
+	City c6("Walvis Bay", false, false, 1);
 
 	travel.addVertex(c1); travel.addVertex(c2);
 	travel.addVertex(c3); travel.addVertex(c4);
@@ -127,7 +128,8 @@ void graphGenerator(){
 	travel.addEdge(c4,c5,2);	travel.addEdge(c5,c4,2);	//waterberg-windhoek
 	travel.addEdge(c5,c6,5);	travel.addEdge(c6,c5,5);	//windhoek-walvis
 
-	travel.floydWarshallShortestPath();
+
+	travel.landAndBegin(10);
 
 	floydWarshallTester(travel.getW(), 6);
 
