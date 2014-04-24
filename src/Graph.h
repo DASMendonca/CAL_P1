@@ -170,8 +170,11 @@ public:
 	bool visitGo(int city_index);
 	bool restGo(int city_index);
 	bool travel(vector<int> destinations, int city_index);
+	bool beginWayBack(int city_index);
 	bool toAirportFrom(int city_index);
-
+	bool selectReturnAtion(int city_index,int airport_city);
+	bool backFromRp(int city_index, int airport_city);
+	bool backFromCity(int city_index, int airport_city);
 
 
 	void updateEdges();
@@ -195,7 +198,7 @@ public:
 	vector<int> getAirportCitys();
 	vector<int> cityTravelCosts(int city_index);
 	vector<int> restingTravelCosts(int city_index);
-	vector<int> getCostsFromTo(int city_index, vector<int> destinations)
+	vector<int> getCostsFromTo(int city_index, vector<int> destinations);
 
 };
 
@@ -369,8 +372,6 @@ bool Graph<T>::landAndBegin(int daily_time){
 		}
 		index++;
 	}
-	//TODO back to airport again
-
 	return is_possible;
 }
 
@@ -505,6 +506,7 @@ vector<int> Graph<T>::getBestCityTo(int city_index){
 	return citys_index;
 }
 
+
 template <class T>
 vector<int> Graph<T>::getCostsFromTo(int city_index, vector<int> destinations){
 	vector<int> costs;
@@ -550,8 +552,9 @@ bool Graph<T>::visitGo(int city_index){
 	vertexSet[city_index]->setVisited();
 
 	if(allVisited()){
-		//todo
-		return true;
+		if(toAirportFrom(city_index))
+			return true;
+		return false;
 	}
 
 	vector<int> unvisited_ip = getIpUnvisited();
@@ -599,8 +602,9 @@ bool Graph<T>::visitRestGo(int city_index){
 	{
 		available_time -= visit_time;
 		if(allVisited()){
-			//todo
-			return true;
+			if(toAirportFrom(city_index))
+				return true;
+			return false;
 		}
 
 
@@ -621,9 +625,11 @@ bool Graph<T>::visitRestGo(int city_index){
 		available_time -= visit_time;
 
 		if(allVisited()){
-			//todo
-			return true;
+			if(toAirportFrom(city_index))
+				return true;
+			return false;
 		}
+
 		if(travel(unvisited_ip, city_index))
 			return true;
 	}
@@ -662,9 +668,15 @@ template <class T>
 bool Graph<T>::toAirportFrom(int city_index){
 
 	vector<int> airport_citys = getAirportCitys();
+	vector<int> tc = getCostsFromTo(city_index, airport_citys);
+	quickSortIndex(airport_citys, tc);
+	int tmp_av_t = available_time;
 
-
-
+	for(int i =0; i< airport_citys.size(); i++)
+	{
+		if(selectReturnAtion(city_index, airport_citys[i]))
+			return true;
+	}
 	return false;
 }
 
@@ -704,4 +716,100 @@ void Graph<T>::filterAndOrder(vector<int> destinations, vector<int> city_tc){
 }
 
 
+template <class T>
+bool Graph<T>::selectReturnAtion(int city_index,int airport_city){
+	if(vertexSet[city_index]->info.hasRestingPlace())
+		return backFromRp(city_index, airport_city);
+
+	return backFromCity(city_index, airport_city);
+}
+
+
+template <class T>
+bool Graph<T>::backFromRp(int city_index, int airport_city){
+	if(vertexSet[city_index]->info.hasAirport())
+		return true;
+
+	int tc = W[city_index][airport_city];
+	int tmp_av_t = available_time;
+
+	//go directly
+	if(available_time >= tc)
+	{
+		solution.push_back(vertexSet[airport_city]);
+		available_time -= tc;
+		return true;
+	}
+
+	//rest and go
+	available_time = daily_time;
+	days++;
+
+	if(available_time>= tc)
+	{
+		solution.push_back(vertexSet[airport_city]);
+		available_time -= tc;
+		return true;
+	}
+
+
+	//go through best intermidiate
+	int intermediate_index = P[city_index][airport_city];
+	if(intermediate_index <=0)
+	{
+		days--;
+		available_time = tmp_av_t;
+		return false;
+	}
+	//there is an intermediate
+	if(vertexSet[intermediate_index]->info.isRestingPlace())
+	{
+		available_time -= W[city_index][intermediate_index];
+		solution.push_back(vertexSet[intermediate_index]);
+		if(selectReturnAtion(intermediate_index, airport_city))
+			return true;
+
+		solution.pop_back();
+		available_time = tmp_av_t;
+	}
+
+	return false;
+}
+
+
+template <class T>
+bool Graph<T>::backFromCity(int city_index, int airport_city){
+	if(vertexSet[city_index]->info.hasAirport())
+		return true;
+
+	int tc = W[city_index][airport_city];
+	int tmp_av_t = available_time;
+
+	if(available_time >=tc)
+	{
+		solution.push_back(vertexSet[airport_city]);
+		available_time -= tc;
+		return true;
+	}
+
+	int intermediate_index = P[city_index][airport_city];
+	if(intermediate_index <=0)
+	{
+		available_time = tmp_av_t;
+		return false;
+	}
+	//there is an intermediate
+	if(vertexSet[intermediate_index]->info.isRestingPlace())
+	{
+		available_time -= W[city_index][intermediate_index];
+		solution.push_back(vertexSet[intermediate_index]);
+		if(selectReturnAtion(intermediate_index, airport_city))
+			return true;
+
+		solution.pop_back();
+		available_time = tmp_av_t;
+	}
+
+	return false;
+}
 #endif /* GRAPH_H_ */
