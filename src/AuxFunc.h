@@ -16,7 +16,7 @@ void quicksortIndex(int arr[], int size);
 
 void quickSortIndex(vector<int> index, vector<int> vals);
 
-int* getMatrixColumn(int** matrix, int column_index, int nr_rows);
+void getMatrixColumn(int** matrix, int column_index, int nr_rows, int *column);
 
 
 #endif /* AUXFUNC_H_ */

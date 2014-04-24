@@ -164,13 +164,10 @@ public:
 	bool allVisited();
 	bool landAndBegin(int daily_time);
 	bool selectAction(int city_index);
-	bool visitFromIpRp(int city_index);
-	bool visitFromRp(int city_index, int next_index);
 	bool visitRestGo(int city_index);
 	bool visitGo(int city_index);
 	bool restGo(int city_index);
 	bool travel(vector<int> destinations, int city_index);
-	bool beginWayBack(int city_index);
 	bool toAirportFrom(int city_index);
 	bool selectReturnAtion(int city_index,int airport_city);
 	bool backFromRp(int city_index, int airport_city);
@@ -405,28 +402,7 @@ bool Graph<T>::selectAction(int city_index){
 }
 
 
-template <class T>
-bool Graph<T>::visitFromIpRp(int city_index){
 
-	//todo
-	if(available_time>= vertexSet[city_index]->info.getVisitTime()){
-		available_time-=vertexSet[city_index]->info.getVisitTime();
-
-	}
-
-	return true;
-}
-
-
-template <class T>
-void Graph<T>::testerfunction(){
-	cout<<vertexSet[0]->info.getName()<<endl;
-}
-
-
-/*
- *returns an array with the costs to unvisited Interest Points, visited ones and non IP also in but with INT_MAX
- */
 template <class T>
 vector<int> Graph<T>::cityTravelCosts(int city_index){
 	vector<int> city_tc;
@@ -498,7 +474,9 @@ vector<int> Graph<T>::getBestCityTo(int city_index){
 	int *order_by_cost;
 	vector<int> citys_index;
 
-	order_by_cost = quicksortIndex(getMatrixColumn(W, city_index, size), size);
+	int column[size];
+	getMatrixColumn(W, city_index, size, column);
+	order_by_cost = quicksortIndex(column, size);
 
 	for(int i =0; i<size; i++)
 		citys_index.push_back(order_by_cost[i]);

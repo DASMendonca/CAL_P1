@@ -30,8 +30,8 @@ void quicksortIndex(int arr[], int size){
 }
 
 void quickSortIndex(vector<int> index, vector<int> vals){
-	for(int i =0; i<index.size(); i++){
-		for(int j =0; j<index.size(); j++){
+	for(unsigned int i =0; i<index.size(); i++){
+		for(unsigned int j =0; j<index.size(); j++){
 			if(vals[j] < vals[i]){
 				int tmp = vals[i];
 				vals[i] = vals[j];
@@ -45,15 +45,12 @@ void quickSortIndex(vector<int> index, vector<int> vals){
 	}
 }
 
-int* getMatrixColumn(int** matrix, int column_index, int nr_rows){
-	int arr[nr_rows];
+void getMatrixColumn(int** matrix, int column_index, int nr_rows, int *column){
 
 	for(int i =0; i< nr_rows; i++)
 	{
-		arr[i]= matrix[column_index][i];
+		column[i]= matrix[column_index][i];
 	}
-
-	return arr;
 }
 
 

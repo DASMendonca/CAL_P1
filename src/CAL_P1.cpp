@@ -130,7 +130,6 @@ void graphGenerator(){
 	travel.floydWarshallShortestPath();
 
 	floydWarshallTester(travel.getW(), 6);
-	travel.testerfunction();
 
 
 }
