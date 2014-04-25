@@ -363,6 +363,7 @@ template <class T>
 bool Graph<T>::landAndBegin(int daily_time){
 	this->daily_time = daily_time;
 	available_time = daily_time;
+	days=0;
 	floydWarshallShortestPath();
 
 	typename vector<Vertex<T> *>::iterator it = vertexSet.begin();
@@ -389,7 +390,6 @@ bool Graph<T>::landAndBegin(int daily_time){
 
 	return is_possible;
 }
-
 
 
 template <class T>
@@ -540,8 +540,10 @@ vector<int> Graph<T>::getCostsFromTo(int city_index, vector<int> destinations){
 template <class T>
 bool Graph<T>::restGo(int city_index){
 	int tmp_available_time= available_time;
+	if(available_time<daily_time){
 	available_time = daily_time;
 	days++;
+	}
 	solution.push_back(vertexSet[city_index]);
 
 	vector<int> unvisited_ip = getIpUnvisited();
@@ -553,7 +555,8 @@ bool Graph<T>::restGo(int city_index){
 		return true;
 
 	available_time = tmp_available_time;
-	days--;
+	if(days>0)
+		days--;
 	solution.pop_back();
 	return false;
 }
@@ -573,6 +576,9 @@ bool Graph<T>::visitGo(int city_index){
 	if(allVisited()){
 		if(toAirportFrom(city_index))
 			return true;
+		vertexSet[city_index]->unsetVisited();
+					available_time = tmp_av_time;
+					solution.pop_back();
 		return false;
 	}
 
@@ -612,18 +618,22 @@ bool Graph<T>::visitRestGo(int city_index){
 	solution.push_back(vertexSet[city_index]);
 	vertexSet[city_index]->setVisited();
 
+
 	vector<int> unvisited_ip = getIpUnvisited();
 	vector<int> city_tc = cityTravelCosts(city_index, unvisited_ip);
 	filterAndOrder(unvisited_ip, city_tc);
 
 
 
-	if(available_time > visit_time)
+	if(available_time >= visit_time)
 	{
 		available_time -= visit_time;
 		if(allVisited()){
 			if(toAirportFrom(city_index))
 				return true;
+			vertexSet[city_index]->unsetVisited();
+			available_time = tmp_av_time;
+			solution.pop_back();
 			return false;
 		}
 
@@ -636,6 +646,12 @@ bool Graph<T>::visitRestGo(int city_index){
 			days++;
 			if(travel(unvisited_ip, city_index))
 				return true;
+			vertexSet[city_index]->unsetVisited();
+			available_time = tmp_av_time;
+			days--;
+			solution.pop_back();
+			return false;
+
 		}
 	}
 	else
@@ -647,17 +663,16 @@ bool Graph<T>::visitRestGo(int city_index){
 		if(allVisited()){
 			if(toAirportFrom(city_index))
 				return true;
+			vertexSet[city_index]->unsetVisited();
+			available_time = tmp_av_time;
+			days--;
+			solution.pop_back();
 			return false;
 		}
 
 		if(travel(unvisited_ip, city_index))
 			return true;
 	}
-
-	vertexSet[city_index]->unsetVisited();
-	available_time = tmp_av_time;
-	days--;
-	solution.pop_back();
 
 	return false;
 }
@@ -704,22 +719,7 @@ bool Graph<T>::toAirportFrom(int city_index){
 
 template <class T>
 void Graph<T>::filterAndOrder(vector<int> destinations, vector<int> city_tc){
-	int des_size = destinations.size()-1;
-	int control = destinations[des_size-1];
-	int size = city_tc.size() -1;
 
-	//filter
-	for(int i =size; i>=0; i--)
-	{
-		if(i != control)
-		{
-			city_tc.erase(city_tc.begin() + i);
-		}
-		else{
-			des_size--;
-			control = destinations[des_size];
-		}
-	}
 
 	//order
 	for(int i =0; i<destinations.size(); i++){
@@ -793,6 +793,7 @@ bool Graph<T>::backFromRp(int city_index, int airport_city){
 			return true;
 
 		solution.pop_back();
+		days--;
 		available_time = tmp_av_t;
 	}
 
