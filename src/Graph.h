@@ -541,8 +541,8 @@ template <class T>
 bool Graph<T>::restGo(int city_index){
 	int tmp_available_time= available_time;
 	if(available_time<daily_time){
-	available_time = daily_time;
-	days++;
+		available_time = daily_time;
+		days++;
 	}
 	solution.push_back(vertexSet[city_index]);
 
@@ -577,8 +577,8 @@ bool Graph<T>::visitGo(int city_index){
 		if(toAirportFrom(city_index))
 			return true;
 		vertexSet[city_index]->unsetVisited();
-					available_time = tmp_av_time;
-					solution.pop_back();
+		available_time = tmp_av_time;
+		solution.pop_back();
 		return false;
 	}
 
