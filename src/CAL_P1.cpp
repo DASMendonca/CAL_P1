@@ -12,11 +12,7 @@ using namespace std;
 int main() {
 
 	Graph<City> test;
-	//test = loadGraph();
-	//drawGraph(test);
 	graphGenerator();
-	//graphViewerTest();
-
 	return 0;
 }
 
@@ -109,25 +105,26 @@ void graphGenerator(){
 
 	Graph<City> travel;
 
-	City c1("Etosha National Park", false, true, 4);
-	City c2("Damaraland", false, false, 2);
-	City c3("Swakopmund", false, true, 4);
-	City c4("Waterberg", false, true, 0);
-	City c5("Windhoek", true, true, 0);
-	City c6("Walvis Bay", false, false, 1);
-
-	travel.addVertex(c1); travel.addVertex(c2);
-	travel.addVertex(c3); travel.addVertex(c4);
-	travel.addVertex(c5); travel.addVertex(c6);
-
-	travel.addEdge(c1,c2,2);	travel.addEdge(c2,c1,2);	//etosha-damaraland
-	travel.addEdge(c1,c4,4);	travel.addEdge(c4,c1,4);	//etosha-waterberg
-	travel.addEdge(c2,c3,3);	travel.addEdge(c3,c2,3);	//damaraland-swakopmund
-	travel.addEdge(c2,c5,4);	travel.addEdge(c5,c2,4);	//damaraland-windhoek
-	travel.addEdge(c3,c6,1);	travel.addEdge(c6,c3,1);	//swakopmund-walvis
-	travel.addEdge(c3,c5,5);	travel.addEdge(c5,c3,5);	//swakopmund-windhoek
-	travel.addEdge(c4,c5,2);	travel.addEdge(c5,c4,2);	//waterberg-windhoek
-	travel.addEdge(c5,c6,5);	travel.addEdge(c6,c5,5);	//windhoek-walvis
+//	City c1("Etosha National Park", false, true, 4);
+//	City c2("Damaraland", false, false, 2);
+//	City c3("Swakopmund", false, true, 4);
+//	City c4("Waterberg", false, true, 0);
+//	City c5("Windhoek", true, true, 0);
+//	City c6("Walvis Bay", false, false, 1);
+//
+//	travel.addVertex(c1); travel.addVertex(c2);
+//	travel.addVertex(c3); travel.addVertex(c4);
+//	travel.addVertex(c5); travel.addVertex(c6);
+//
+//	travel.addEdge(c1,c2,2);	travel.addEdge(c2,c1,2);	//etosha-damaraland
+//	travel.addEdge(c1,c4,4);	travel.addEdge(c4,c1,4);	//etosha-waterberg
+//	travel.addEdge(c2,c3,3);	travel.addEdge(c3,c2,3);	//damaraland-swakopmund
+//	travel.addEdge(c2,c5,4);	travel.addEdge(c5,c2,4);	//damaraland-windhoek
+//	travel.addEdge(c3,c6,1);	travel.addEdge(c6,c3,1);	//swakopmund-walvis
+//	travel.addEdge(c3,c5,5);	travel.addEdge(c5,c3,5);	//swakopmund-windhoek
+//	travel.addEdge(c4,c5,2);	travel.addEdge(c5,c4,2);	//waterberg-windhoek
+//	travel.addEdge(c5,c6,5);	travel.addEdge(c6,c5,5);	//windhoek-walvis
+	travel = loadGraph();
 
 
 	if(!(travel.landAndBegin(TIME_PER_DAY)))
