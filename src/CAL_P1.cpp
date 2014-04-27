@@ -8,12 +8,13 @@
 
 #include "CAL_P1.h"
 
+using namespace std;
 int main() {
 
 	Graph<City> test;
-	test = loadGraph();
-	drawGraph(test);
-	//graphGenerator();
+	//test = loadGraph();
+	//drawGraph(test);
+	graphGenerator();
 	//graphViewerTest();
 
 	return 0;
@@ -129,10 +130,13 @@ void graphGenerator(){
 	travel.addEdge(c5,c6,5);	travel.addEdge(c6,c5,5);	//windhoek-walvis
 
 
-	travel.landAndBegin(10);
+	if(!(travel.landAndBegin(TIME_PER_DAY)))
+	{
+		cout<<"no solution found"<<endl;
+		exit(1);
+	}
 
-	floydWarshallTester(travel.getW(), 6);
-
+	drawSolution(travel);
 
 }
 
@@ -182,4 +186,57 @@ void floydWarshallTester(int **W, int square_size){
 			cout<<W[i][j]<<" ";
 		cout<<endl;
 	}
+}
+
+
+void drawSolution(Graph<City> &graph){
+	GraphViewer *gv = new GraphViewer(600, 600, true);
+	gv->createWindow(600, 600);
+	gv->defineVertexColor("blue");
+	gv->defineEdgeColor("black");
+
+	vector<Vertex<City> *> path = graph.getSolution();
+	int vertex_size = graph.getVertexSet().size();
+
+	for(int i =0; i< vertex_size; i++)
+	{
+		gv->addNode(i);
+		string label = graph.getVertexSet()[i]->getInfo().getName();
+		ostringstream temp;  //temp as in temporary
+		temp<<label<<"  "<<graph.getVertexSet()[i]->getInfo().getVisitTime();
+		if(graph.getVertexSet()[i]->getInfo().isRestingPlace())
+			temp<<"  Resting Place";
+		if(graph.getVertexSet()[i]->getInfo().hasAirport())
+					temp<<"  Airport";
+		temp<<endl;
+
+		label=temp.str();
+
+		gv->setVertexLabel(i, label);
+	}
+
+	int edge_count=0;
+
+
+	for(unsigned int i =0; i< path.size() -1; i++){
+		int j=i+1;
+		int src = graph.findIndexVertex(graph.getSolution()[i]->getInfo().getName());
+		int dst = graph.findIndexVertex(graph.getSolution()[j]->getInfo().getName());
+		int cost = graph.getCostFromW(src, dst);
+		cout<<"dest: "<<graph.getSolution()[j]->getInfo().getName()<<endl;
+
+		if(src!= dst)
+		{
+
+			gv->addEdge(edge_count, src, dst, EdgeType::DIRECTED);
+			string str;          //The string
+			ostringstream temp;  //temp as in temporary
+			temp<<cost;
+			str=temp.str();
+			gv->setEdgeLabel(edge_count, str);
+			edge_count++;
+		}
+	}
+	gv->rearrange();
+	getchar();
 }

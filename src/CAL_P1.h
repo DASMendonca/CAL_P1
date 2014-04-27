@@ -12,14 +12,18 @@
 #include "graphviewer.h"
 #include <fstream>
 #include <iostream>
+#include <string>
 #include <sstream>
 #include "Graph.h"
 #include "City.h"
 #include "parser.h"
 #include <algorithm>
 
+#define TIME_PER_DAY 10
 
 void graphGenerator();
+
+void drawSolution(Graph<City> &solution);
 
 void graphViewerTest();
 

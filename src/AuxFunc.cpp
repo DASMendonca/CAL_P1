@@ -25,8 +25,9 @@ void quicksortIndex(int arr[], int size){
 				temp[j]=i;
 			}
 		}
-	for(int i=0; i<size; i++)
+	for(int i=0; i<size; i++){
 		arr[i]= temp[i];
+	}
 }
 
 void quickSortIndex(vector<int> index, vector<int> vals){
