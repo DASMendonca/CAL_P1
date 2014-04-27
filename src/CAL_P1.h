@@ -20,6 +20,7 @@
 #include <algorithm>
 
 #define TIME_PER_DAY 10
+#define DEBUG 0
 
 void graphGenerator();
 

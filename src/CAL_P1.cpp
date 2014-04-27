@@ -70,17 +70,30 @@ Graph<City> loadGraph() {
 	vector<vector<string> > edges;
 	vertexes = readVertex("vertex.csv"); //TEMP HARDCODED FILENAME
 	edges = readEdge("edge.csv", vertexes.size()); //TEMP HARDCODED FILENAME
+
+	if(DEBUG)
+		for(unsigned int i=0; i<vertexes.size(); i++)
+			cout<<vertexes[i][0]<<" "<<vertexes[i][1]<<" "<<vertexes[i][2]<<" "<<vertexes[i][3]<<endl;
+
+	if(DEBUG)
+		for(unsigned int i=0; i<edges.size(); i++){
+			for(unsigned int j=0; j< edges[i].size(); j++)
+				cout<<edges[i][j]<<" ";
+			cout<<endl;
+		}
+
 	for (unsigned int i = 0; i < vertexes.size(); i++) {
 		int result;
 		stringstream convert(vertexes[i][3]);
 		convert >> result;
-		toLoad.addVertex(City(vertexes[i][0], stringtobool(vertexes[i][1]), stringtobool(vertexes[i][1]), result));
+		bool airport = stringtobool(vertexes[i][1]);
+		bool resting = stringtobool(vertexes[i][2]);
+		int visit_time = atoi(vertexes[i][3].c_str());
+		toLoad.addVertex(City(vertexes[i][0], airport, resting, visit_time));
 	}
 	for (unsigned int i = 0; i < edges.size(); i++) {
 		for (unsigned int j = 0; j < edges[i].size(); j++) {
-			double result;
-			stringstream convert(edges[i][j]);
-			convert >> result;
+			int result = atoi(edges[i][j].c_str());
 			if (result != 0) {
 				toLoad.addEdge(toLoad.getVertexSet()[i]->getInfo(), toLoad.getVertexSet()[j]->getInfo(), result);
 			}
@@ -105,25 +118,25 @@ void graphGenerator(){
 
 	Graph<City> travel;
 
-//	City c1("Etosha National Park", false, true, 4);
-//	City c2("Damaraland", false, false, 2);
-//	City c3("Swakopmund", false, true, 4);
-//	City c4("Waterberg", false, true, 0);
-//	City c5("Windhoek", true, true, 0);
-//	City c6("Walvis Bay", false, false, 1);
-//
-//	travel.addVertex(c1); travel.addVertex(c2);
-//	travel.addVertex(c3); travel.addVertex(c4);
-//	travel.addVertex(c5); travel.addVertex(c6);
-//
-//	travel.addEdge(c1,c2,2);	travel.addEdge(c2,c1,2);	//etosha-damaraland
-//	travel.addEdge(c1,c4,4);	travel.addEdge(c4,c1,4);	//etosha-waterberg
-//	travel.addEdge(c2,c3,3);	travel.addEdge(c3,c2,3);	//damaraland-swakopmund
-//	travel.addEdge(c2,c5,4);	travel.addEdge(c5,c2,4);	//damaraland-windhoek
-//	travel.addEdge(c3,c6,1);	travel.addEdge(c6,c3,1);	//swakopmund-walvis
-//	travel.addEdge(c3,c5,5);	travel.addEdge(c5,c3,5);	//swakopmund-windhoek
-//	travel.addEdge(c4,c5,2);	travel.addEdge(c5,c4,2);	//waterberg-windhoek
-//	travel.addEdge(c5,c6,5);	travel.addEdge(c6,c5,5);	//windhoek-walvis
+	//	City c1("Etosha National Park", false, true, 4);
+	//	City c2("Damaraland", false, false, 2);
+	//	City c3("Swakopmund", false, true, 4);
+	//	City c4("Waterberg", false, true, 0);
+	//	City c5("Windhoek", true, true, 0);
+	//	City c6("Walvis Bay", false, false, 1);
+	//
+	//	travel.addVertex(c1); travel.addVertex(c2);
+	//	travel.addVertex(c3); travel.addVertex(c4);
+	//	travel.addVertex(c5); travel.addVertex(c6);
+	//
+	//	travel.addEdge(c1,c2,2);	travel.addEdge(c2,c1,2);	//etosha-damaraland
+	//	travel.addEdge(c1,c4,4);	travel.addEdge(c4,c1,4);	//etosha-waterberg
+	//	travel.addEdge(c2,c3,3);	travel.addEdge(c3,c2,3);	//damaraland-swakopmund
+	//	travel.addEdge(c2,c5,4);	travel.addEdge(c5,c2,4);	//damaraland-windhoek
+	//	travel.addEdge(c3,c6,1);	travel.addEdge(c6,c3,1);	//swakopmund-walvis
+	//	travel.addEdge(c3,c5,5);	travel.addEdge(c5,c3,5);	//swakopmund-windhoek
+	//	travel.addEdge(c4,c5,2);	travel.addEdge(c5,c4,2);	//waterberg-windhoek
+	//	travel.addEdge(c5,c6,5);	travel.addEdge(c6,c5,5);	//windhoek-walvis
 	travel = loadGraph();
 
 
@@ -132,6 +145,9 @@ void graphGenerator(){
 		cout<<"no solution found"<<endl;
 		exit(1);
 	}
+
+	if(DEBUG)
+		floydWarshallTester(travel.getW(), travel.getVertexSet().size());
 
 	drawSolution(travel);
 
@@ -204,7 +220,7 @@ void drawSolution(Graph<City> &graph){
 		if(graph.getVertexSet()[i]->getInfo().isRestingPlace())
 			temp<<"  Resting Place";
 		if(graph.getVertexSet()[i]->getInfo().hasAirport())
-					temp<<"  Airport";
+			temp<<"  Airport";
 		temp<<endl;
 
 		label=temp.str();
@@ -220,6 +236,7 @@ void drawSolution(Graph<City> &graph){
 		int src = graph.findIndexVertex(graph.getSolution()[i]->getInfo().getName());
 		int dst = graph.findIndexVertex(graph.getSolution()[j]->getInfo().getName());
 		int cost = graph.getCostFromW(src, dst);
+		if(DEBUG)
 		cout<<"dest: "<<graph.getSolution()[j]->getInfo().getName()<<endl;
 
 		if(src!= dst)
